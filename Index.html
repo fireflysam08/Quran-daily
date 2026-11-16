@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,11 +6,100 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#F7F6F0">
   <title>Quran Daily Tracker</title>
+  <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-  <h1>Quran Daily Tracker</h1>
-  <p>My personal Quran journey.</p>
-  <h2>Today's Reading</h2>
-  <p>Start your Quran reading journey today.</p>
+  <main class="app">
+
+    <header>
+      <div>
+        <p class="greeting">Assalamualaikum 🌙</p>
+        <h1>My Quran Journey</h1>
+        <p class="date" id="today"></p>
+      </div>
+      <div>📖</div>
+    </header>
+
+    <section class="card progress-card">
+      <p>My Khatam Progress</p>
+      <div class="progress-number">12 / 30 Juz</div>
+      <div class="progress-track">
+        <div class="progress-fill"></div>
+      </div>
+      <p style="margin-top:12px;font-size:13px">
+        40% completed
+      </p>
+    </section>
+
+    <h2 class="section-title">My Statistics</h2>
+
+    <section class="stats">
+      <div class="stat">
+        <div class="stat-number">15 🔥</div>
+        <p class="stat-label">Reading Streak</p>
+      </div>
+
+      <div class="stat">
+        <div class="stat-number">120</div>
+        <p class="stat-label">Pages Read</p>
+      </div>
+
+      <div class="stat">
+        <div class="stat-number">12</div>
+        <p class="stat-label">Juz Completed</p>
+      </div>
+
+      <div class="stat">
+        <div class="stat-number">30</div>
+        <p class="stat-label">Reading Sessions</p>
+      </div>
+    </section>
+
+    <h2 class="section-title" style="margin-top:28px">
+      Today's Reading
+    </h2>
+
+    <section class="card">
+      <p style="font-size:13px;color:#85877F">
+        Last reading session
+      </p>
+
+      <h2 style="margin:10px 0">
+        Surah Al-Baqarah
+      </h2>
+
+      <p style="font-size:13px;color:#85877F">
+        Ayat 1 – 20 · 5 Pages
+      </p>
+
+      <button style="margin-top:18px;width:100%"
+        onclick="alert('Reading tracker coming soon!')">
+        + Record Reading
+      </button>
+    </section>
+
+    <h2 class="section-title">Daily Reminder</h2>
+
+    <section class="card">
+      <p>وَرَتِّلِ الْقُرْآنَ تَرْتِيلًا</p>
+      <p style="font-size:12px;color:#85877F;margin-top:10px">
+        And recite the Quran with measured recitation.
+        <br>Surah Al-Muzzammil 73:4
+      </p>
+    </section>
+
+  </main>
+
+  <script>
+    document.getElementById("today").textContent =
+      new Date().toLocaleDateString("en-MY", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric"
+      });
+  </script>
+
 </body>
 </html>
