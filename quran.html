@@ -8,8 +8,10 @@
   <title>Quran Reader | Quran Daily Tracker</title>
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
   <main class="app">
+
     <header>
       <div>
         <p class="greeting">Your Daily Quran Reading 🌙</p>
@@ -19,6 +21,7 @@
       <div>📖</div>
     </header>
 
+    <!-- READER CONTROLS -->
     <section class="card">
       <h2 class="section-title">Choose Your Reading</h2>
 
@@ -42,24 +45,69 @@
       </div>
     </section>
 
+    <!-- SURAH INFORMATION -->
     <section class="card surah-heading">
       <p id="surahNumber">Surah 1</p>
       <h2 id="surahArabic" dir="rtl">الْفَاتِحَة</h2>
       <h3 id="surahName">Al-Faatiha</h3>
       <p id="surahInformation">Loading...</p>
+
+      <button type="button" id="favoriteSurahButton">
+        ☆ Add to Favourite Surahs
+      </button>
     </section>
 
+    <!-- FAVOURITES -->
+    <section class="card" id="favouritesSection">
+      <h2 class="section-title">My Favourites ♥</h2>
+      <p class="section-description">
+        Keep meaningful ayat and surahs close to your heart.
+      </p>
+
+      <div class="font-controls">
+        <button type="button" id="favAyatTab">
+          Favourite Ayat
+        </button>
+
+        <button type="button" id="favSurahsTab">
+          Favourite Surahs
+        </button>
+      </div>
+
+      <div id="favAyatPanel">
+        <h3>My Favourite Ayat</h3>
+        <div id="favAyatList">
+          <p>No favourite ayat saved yet.</p>
+        </div>
+      </div>
+
+      <div id="favSurahsPanel" hidden>
+        <h3>My Favourite Surahs</h3>
+        <div id="favSurahsList">
+          <p>No favourite surahs saved yet.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- QURAN TEXT -->
     <div id="readerStatus" class="reader-status">
       Loading Quran...
     </div>
 
     <section id="ayahContainer"></section>
 
+    <!-- SURAH NAVIGATION -->
     <section class="card reader-navigation">
-      <button type="button" id="previousSurah">← Previous Surah</button>
-      <button type="button" id="nextSurah">Next Surah →</button>
+      <button type="button" id="previousSurah">
+        ← Previous Surah
+      </button>
+
+      <button type="button" id="nextSurah">
+        Next Surah →
+      </button>
     </section>
 
+    <!-- SOURCE -->
     <section class="card source-note">
       <p>Quran text and translations provided by AlQuran Cloud.</p>
       <p>
@@ -72,8 +120,10 @@
         View Quran content credits
       </a>
     </section>
+
   </main>
 
+  <!-- BOTTOM NAVIGATION -->
   <nav class="bottom-nav">
     <a href="index.html">🏠<span>Home</span></a>
     <a href="reading.html">📖<span>Reading</span></a>
