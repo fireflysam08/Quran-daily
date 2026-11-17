@@ -1,0 +1,124 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#F7F6F0">
+  <title>Reading Dashboard | Quran Daily Tracker</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <main class="app">
+
+    <header>
+      <div>
+        <p class="greeting">My Quran Journey</p>
+        <h1>Reading Dashboard</h1>
+        <p class="date" id="today"></p>
+      </div>
+      <div>📖</div>
+    </header>
+
+    <nav class="main-nav">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="reading.html" class="nav-link active">Reading</a>
+      <a href="memorisation.html" class="nav-link">Memorisation</a>
+    </nav>
+
+    <section class="card progress-card">
+      <p>My Khatam Progress</p>
+      <div class="progress-number">12 / 30 Juz</div>
+      <div class="progress-track">
+        <div class="progress-fill"></div>
+      </div>
+      <p style="margin-top:12px;font-size:13px">
+        40% completed
+      </p>
+    </section>
+
+    <h2 class="section-title">Record Your Reading</h2>
+
+    <section class="card">
+      <form id="readingForm">
+
+        <label for="readingDate">Reading Date</label>
+        <input type="date" id="readingDate" required>
+
+        <label for="surah">Surah</label>
+        <input type="text" id="surah"
+          placeholder="Example: Al-Baqarah" required>
+
+        <div class="form-row">
+          <div>
+            <label for="startAyah">Start Ayah</label>
+            <input type="number" id="startAyah" min="1" required>
+          </div>
+          <div>
+            <label for="endAyah">End Ayah</label>
+            <input type="number" id="endAyah" min="1" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div>
+            <label for="pages">Pages Read</label>
+            <input type="number" id="pages" min="1" required>
+          </div>
+          <div>
+            <label for="juz">Juz</label>
+            <select id="juz" required>
+              <option value="">Select Juz</option>
+              <script>
+                for(let i=1;i<=30;i++){
+                  document.write(`<option value="${i}">Juz ${i}</option>`);
+                }
+              </script>
+            </select>
+          </div>
+        </div>
+
+        <label for="duration">Reading Duration (minutes)</label>
+        <input type="number" id="duration" min="1">
+
+        <label for="notes">Notes (Optional)</label>
+        <textarea id="notes"
+          placeholder="Reflection or notes..."></textarea>
+
+        <button type="submit"
+          style="width:100%;margin-top:20px">
+          Save Reading
+        </button>
+
+      </form>
+    </section>
+
+    <h2 class="section-title">Reading History</h2>
+
+    <section class="card" id="readingHistory">
+      <p>Your reading records will appear here.</p>
+    </section>
+
+  </main>
+
+  <nav class="bottom-nav">
+    <a href="index.html">🏠<span>Home</span></a>
+    <a href="reading.html">📖<span>Reading</span></a>
+    <a href="memorisation.html">🧠<span>Memorise</span></a>
+  </nav>
+
+  <script>
+    document.getElementById("today").textContent =
+      new Date().toLocaleDateString("en-MY", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric"
+      });
+  </script>
+
+  <script src="app.js"></script>
+
+</body>
+</html>
