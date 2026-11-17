@@ -21,149 +21,267 @@
       <div>📖</div>
     </header>
 
-    <section class="card progress-card">
-      <p>My Khatam Progress</p>
-      <div class="progress-number">12 / 30 Juz</div>
-      <div class="progress-track">
-        <div class="progress-fill"></div>
-      </div>
-      <p style="margin-top:12px;font-size:13px">
-        40% completed
-      </p>
+    <!-- MAIN NAVIGATION -->
+    <nav class="main-nav">
+      <a href="#home" class="nav-link active">Home</a>
+      <a href="#reading" class="nav-link">Reading</a>
+      <a href="#memorisation" class="nav-link">Memorisation</a>
+    </nav>
+
+    <!-- HOME DASHBOARD -->
+    <section id="home">
+
+      <section class="card progress-card">
+        <p>My Khatam Progress</p>
+        <div class="progress-number">12 / 30 Juz</div>
+        <div class="progress-track">
+          <div class="progress-fill"></div>
+        </div>
+        <p style="margin-top:12px;font-size:13px">
+          40% completed
+        </p>
+      </section>
+
+      <h2 class="section-title">Reading Statistics</h2>
+
+      <section class="stats">
+        <div class="stat">
+          <div class="stat-number">15 🔥</div>
+          <p class="stat-label">Reading Streak</p>
+        </div>
+
+        <div class="stat">
+          <div class="stat-number">120</div>
+          <p class="stat-label">Pages Read</p>
+        </div>
+
+        <div class="stat">
+          <div class="stat-number">12</div>
+          <p class="stat-label">Juz Completed</p>
+        </div>
+
+        <div class="stat">
+          <div class="stat-number">30</div>
+          <p class="stat-label">Reading Sessions</p>
+        </div>
+      </section>
+
+      <h2 class="section-title" style="margin-top:28px">
+        Memorisation Overview
+      </h2>
+
+      <section class="card">
+        <p>My Memorisation Journey</p>
+        <p style="font-size:28px;font-weight:bold;margin:12px 0">
+          Start your journey
+        </p>
+        <p style="font-size:13px;color:#85877F">
+          Track new memorisation, revision and retention separately.
+        </p>
+        <a href="#memorisation" class="action-link">
+          Open Memorisation Dashboard →
+        </a>
+      </section>
+
+      <h2 class="section-title">Daily Reminder</h2>
+
+      <section class="card">
+        <p>وَرَتِّلِ الْقُرْآنَ تَرْتِيلًا</p>
+        <p style="font-size:12px;color:#85877F;margin-top:10px">
+          And recite the Quran with measured recitation.
+          <br>Surah Al-Muzzammil 73:4
+        </p>
+      </section>
+
     </section>
 
-    <h2 class="section-title">My Statistics</h2>
+    <!-- READING DASHBOARD -->
+    <section id="reading" class="dashboard-section">
 
-    <section class="stats">
-      <div class="stat">
-        <div class="stat-number">15 🔥</div>
-        <p class="stat-label">Reading Streak</p>
-      </div>
+      <h2 class="section-title">Reading Dashboard</h2>
+      <p class="section-description">
+        Track your Quran reading sessions and khatam progress.
+      </p>
 
-      <div class="stat">
-        <div class="stat-number">120</div>
-        <p class="stat-label">Pages Read</p>
-      </div>
+      <h2 class="section-title">Record Your Reading</h2>
 
-      <div class="stat">
-        <div class="stat-number">12</div>
-        <p class="stat-label">Juz Completed</p>
-      </div>
+      <section class="card">
+        <form id="readingForm">
 
-      <div class="stat">
-        <div class="stat-number">30</div>
-        <p class="stat-label">Reading Sessions</p>
-      </div>
+          <label for="readingDate">Reading Date</label>
+          <input type="date" id="readingDate" required>
+
+          <label for="surah">Surah</label>
+          <input type="text" id="surah"
+            placeholder="Example: Al-Baqarah" required>
+
+          <div class="form-row">
+            <div>
+              <label for="startAyah">Start Ayah</label>
+              <input type="number" id="startAyah"
+                min="1" required>
+            </div>
+
+            <div>
+              <label for="endAyah">End Ayah</label>
+              <input type="number" id="endAyah"
+                min="1" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div>
+              <label for="pages">Pages Read</label>
+              <input type="number" id="pages"
+                min="1" required>
+            </div>
+
+            <div>
+              <label for="juz">Juz</label>
+              <select id="juz" required>
+                <option value="">Select Juz</option>
+                <option value="1">Juz 1</option>
+                <option value="2">Juz 2</option>
+                <option value="3">Juz 3</option>
+                <option value="4">Juz 4</option>
+                <option value="5">Juz 5</option>
+                <option value="6">Juz 6</option>
+                <option value="7">Juz 7</option>
+                <option value="8">Juz 8</option>
+                <option value="9">Juz 9</option>
+                <option value="10">Juz 10</option>
+                <option value="11">Juz 11</option>
+                <option value="12">Juz 12</option>
+                <option value="13">Juz 13</option>
+                <option value="14">Juz 14</option>
+                <option value="15">Juz 15</option>
+                <option value="16">Juz 16</option>
+                <option value="17">Juz 17</option>
+                <option value="18">Juz 18</option>
+                <option value="19">Juz 19</option>
+                <option value="20">Juz 20</option>
+                <option value="21">Juz 21</option>
+                <option value="22">Juz 22</option>
+                <option value="23">Juz 23</option>
+                <option value="24">Juz 24</option>
+                <option value="25">Juz 25</option>
+                <option value="26">Juz 26</option>
+                <option value="27">Juz 27</option>
+                <option value="28">Juz 28</option>
+                <option value="29">Juz 29</option>
+                <option value="30">Juz 30</option>
+              </select>
+            </div>
+          </div>
+
+          <label for="duration">Reading Duration (minutes)</label>
+          <input type="number" id="duration"
+            min="1" placeholder="Example: 20">
+
+          <label for="notes">Notes (Optional)</label>
+          <textarea id="notes"
+            placeholder="Reflection or notes..."></textarea>
+
+          <button type="submit" style="width:100%;margin-top:20px">
+            Save Reading
+          </button>
+
+        </form>
+      </section>
+
+      <h2 class="section-title">Reading History</h2>
+
+      <section class="card" id="readingHistory">
+        <p style="color:#85877F;font-size:13px">
+          Your reading records will appear here.
+        </p>
+      </section>
+
     </section>
 
-    
-<h2 class="section-title" style="margin-top:28px">
-  Record Your Reading
-</h2>
+    <!-- MEMORISATION DASHBOARD -->
+    <section id="memorisation" class="dashboard-section">
 
-<section class="card">
-  <form id="readingForm">
-
-    <label for="readingDate">Reading Date</label>
-    <input type="date" id="readingDate" required>
-
-    <label for="surah">Surah</label>
-    <input type="text" id="surah"
-      placeholder="Example: Al-Baqarah" required>
-
-    <div class="form-row">
-      <div>
-        <label for="startAyah">Start Ayah</label>
-        <input type="number" id="startAyah"
-          min="1" required>
-      </div>
-
-      <div>
-        <label for="endAyah">End Ayah</label>
-        <input type="number" id="endAyah"
-          min="1" required>
-      </div>
-    </div>
-
-    <div class="form-row">
-      <div>
-        <label for="pages">Pages Read</label>
-        <input type="number" id="pages"
-          min="1" required>
-      </div>
-
-      <div>
-        <label for="juz">Juz</label>
-        <select id="juz" required>
-          <option value="">Select Juz</option>
-          <option value="1">Juz 1</option>
-          <option value="2">Juz 2</option>
-          <option value="3">Juz 3</option>
-          <option value="4">Juz 4</option>
-          <option value="5">Juz 5</option>
-          <option value="6">Juz 6</option>
-          <option value="7">Juz 7</option>
-          <option value="8">Juz 8</option>
-          <option value="9">Juz 9</option>
-          <option value="10">Juz 10</option>
-          <option value="11">Juz 11</option>
-          <option value="12">Juz 12</option>
-          <option value="13">Juz 13</option>
-          <option value="14">Juz 14</option>
-          <option value="15">Juz 15</option>
-          <option value="16">Juz 16</option>
-          <option value="17">Juz 17</option>
-          <option value="18">Juz 18</option>
-          <option value="19">Juz 19</option>
-          <option value="20">Juz 20</option>
-          <option value="21">Juz 21</option>
-          <option value="22">Juz 22</option>
-          <option value="23">Juz 23</option>
-          <option value="24">Juz 24</option>
-          <option value="25">Juz 25</option>
-          <option value="26">Juz 26</option>
-          <option value="27">Juz 27</option>
-          <option value="28">Juz 28</option>
-          <option value="29">Juz 29</option>
-          <option value="30">Juz 30</option>
-        </select>
-      </div>
-    </div>
-
-    <label for="duration">Reading Duration (minutes)</label>
-    <input type="number" id="duration"
-      min="1" placeholder="Example: 20">
-
-    <label for="notes">Notes (Optional)</label>
-    <textarea id="notes"
-      placeholder="Reflection or notes..."></textarea>
-
-    <button type="submit" style="width:100%;margin-top:20px">
-      Save Reading
-    </button>
-
-  </form>
-</section>
-
-<h2 class="section-title">Reading History</h2>
-
-<section class="card" id="readingHistory">
-  <p style="color:#85877F;font-size:13px">
-    Your reading records will appear here.
-  </p>
-</section>
-    
-    <h2 class="section-title">Daily Reminder</h2>
-
-    <section class="card">
-      <p>وَرَتِّلِ الْقُرْآنَ تَرْتِيلًا</p>
-      <p style="font-size:12px;color:#85877F;margin-top:10px">
-        And recite the Quran with measured recitation.
-        <br>Surah Al-Muzzammil 73:4
+      <h2 class="section-title">Memorisation Dashboard</h2>
+      <p class="section-description">
+        A dedicated space to manage your Hifz journey.
       </p>
+
+      <section class="card">
+        <p class="section-title">My Memorisation Progress</p>
+        <div class="progress-number">0 Ayahs</div>
+        <p class="section-description">
+          Your memorised ayahs will be counted here.
+        </p>
+      </section>
+
+      <h2 class="section-title">My Activities</h2>
+
+      <section class="stats">
+        <div class="stat">
+          <div class="stat-number">0</div>
+          <p class="stat-label">New Ayahs</p>
+        </div>
+
+        <div class="stat">
+          <div class="stat-number">0</div>
+          <p class="stat-label">Revised Ayahs</p>
+        </div>
+
+        <div class="stat">
+          <div class="stat-number">0</div>
+          <p class="stat-label">Memorised Surahs</p>
+        </div>
+
+        <div class="stat">
+          <div class="stat-number">0</div>
+          <p class="stat-label">Tests Completed</p>
+        </div>
+      </section>
+
+      <h2 class="section-title" style="margin-top:28px">
+        Memorisation Activities
+      </h2>
+
+      <section class="card">
+        <h3>📖 New Memorisation</h3>
+        <p class="section-description">
+          Record new surahs and ayah ranges you are learning.
+        </p>
+      </section>
+
+      <section class="card">
+        <h3>🔁 Revision (Murajaah)</h3>
+        <p class="section-description">
+          Record previously memorised ayahs you revise.
+        </p>
+      </section>
+
+      <section class="card">
+        <h3>🧠 Memorisation Test</h3>
+        <p class="section-description">
+          Test your recall and record your results.
+        </p>
+      </section>
+
+      <h2 class="section-title">Memorisation History</h2>
+
+      <section class="card" id="memorisationHistory">
+        <p style="color:#85877F;font-size:13px">
+          Your memorisation records will appear here.
+        </p>
+      </section>
+
     </section>
 
   </main>
+
+  <!-- BOTTOM NAVIGATION -->
+  <nav class="bottom-nav">
+    <a href="#home">🏠<span>Home</span></a>
+    <a href="#reading">📖<span>Reading</span></a>
+    <a href="#memorisation">🧠<span>Memorise</span></a>
+  </nav>
 
   <script>
     document.getElementById("today").textContent =
