@@ -4,100 +4,252 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#F7F6F0">
-  <title>Quran Reader | Quran Daily Tracker</title>
+
+  <title>Quran Reader | Quran Daily</title>
+
   <link rel="stylesheet" href="style.css">
+
+  <style>
+    .reader-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .reader-controls select {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #d8d8cc;
+      background: #fff;
+      font-size: 15px;
+    }
+
+    .font-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+    }
+
+    .font-controls button,
+    .reader-navigation button,
+    #favoriteSurahButton,
+    #translationToggle {
+      padding: 10px 16px;
+      border: 1px solid #c9d5c2;
+      border-radius: 10px;
+      background: #edf2e9;
+      color: #435640;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .translation-control {
+      margin-top: 14px;
+    }
+
+    #translationToggle {
+      width: 100%;
+    }
+
+    .surah-heading {
+      text-align: center;
+      padding: 24px 12px;
+    }
+
+    .surah-heading .surah-arabic {
+      font-family: "Noto Naskh Arabic", serif;
+      font-size: 34px;
+      margin: 10px 0;
+    }
+
+    .mushaf-page {
+      background: #fffdf6;
+      border: 1px solid #e5dfcf;
+      border-radius: 12px;
+      padding: 22px 18px;
+      margin: 20px 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+
+    .mushaf-page-number {
+      text-align: center;
+      color: #8b8b7a;
+      font-size: 12px;
+      margin-bottom: 20px;
+    }
+
+    .mushaf-arabic {
+      direction: rtl;
+      text-align: justify;
+      text-align-last: center;
+      font-family: "Noto Naskh Arabic", "Traditional Arabic", serif;
+      line-height: 2.5;
+      word-spacing: 3px;
+      color: #292b25;
+      margin: 0;
+    }
+
+    .mushaf-ayah {
+      display: inline;
+      border-radius: 4px;
+      transition: background 0.2s;
+    }
+
+    .mushaf-ayah.selected-ayah {
+      background: #e9efdf;
+    }
+
+    .arabic-ayah-number {
+      color: #71866b;
+      font-size: 0.75em;
+      white-space: nowrap;
+    }
+
+    .mushaf-favorite-button {
+      display: inline;
+      border: none;
+      background: transparent;
+      color: #a16d65;
+      font-size: 17px;
+      cursor: pointer;
+      padding: 0 2px;
+    }
+
+    .mushaf-translations {
+      border-top: 1px solid #e8e3d8;
+      margin-top: 22px;
+      padding-top: 14px;
+      direction: ltr;
+    }
+
+    .translation-line {
+      padding: 10px 0;
+      border-bottom: 1px solid #eeeae2;
+      font-size: 14px;
+      line-height: 1.7;
+      color: #55594e;
+    }
+
+    .translation-line strong {
+      color: #71866b;
+      font-size: 12px;
+    }
+
+    .translation-line p {
+      margin: 5px 0 0;
+    }
+
+    .reader-navigation {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 20px 0;
+    }
+
+    .reader-navigation button {
+      flex: 1;
+    }
+
+    .reader-status {
+      text-align: center;
+      color: #71866b;
+      font-size: 13px;
+      margin: 12px 0;
+    }
+
+    @media (max-width: 480px) {
+      .mushaf-page {
+        padding: 18px 12px;
+      }
+
+      .reader-navigation button {
+        padding: 10px 8px;
+        font-size: 12px;
+      }
+    }
+  </style>
 </head>
 
 <body>
+
   <main class="app">
 
-    <header>
-      <div>
-        <p class="greeting">Your Daily Quran Reading 🌙</p>
-        <h1>Quran Reader</h1>
-        <p class="date">Read, reflect and reconnect.</p>
-      </div>
-      <div>📖</div>
+    <header class="page-header">
+      <h1>Quran Reader</h1>
+      <p>Read, reflect and continue your Quran journey.</p>
     </header>
 
     <!-- READER CONTROLS -->
     <section class="card">
-      <h2 class="section-title">Choose Your Reading</h2>
 
-      <label for="surahSelect">Select Surah</label>
-      <select id="surahSelect">
-        <option value="">Loading Surahs...</option>
-      </select>
+      <div class="reader-controls">
 
-      <label for="readingMode">Reading Mode</label>
-      <select id="readingMode">
-        <option value="arabic">Arabic Only</option>
-        <option value="malay" selected>Arabic + Malay</option>
-        <option value="english">Arabic + English</option>
-      </select>
+        <label for="surahSelect">Choose Surah</label>
 
-      <label>Arabic Font Size</label>
-      <div class="font-controls">
-        <button type="button" id="decreaseFont">A−</button>
-        <span id="fontSizeLabel">30 px</span>
-        <button type="button" id="increaseFont">A+</button>
+        <select id="surahSelect">
+          <option value="">Loading Surahs...</option>
+        </select>
+
+        <div class="font-controls">
+
+          <button type="button" id="decreaseFont">
+            A-
+          </button>
+
+          <span id="fontSizeLabel">30 px</span>
+
+          <button type="button" id="increaseFont">
+            A+
+          </button>
+
+        </div>
+
+        <button type="button" id="favoriteSurahButton">
+          ♡ Add to Favourite Surahs
+        </button>
+
       </div>
+
     </section>
 
     <!-- SURAH INFORMATION -->
     <section class="card surah-heading">
+
       <p id="surahNumber">Surah 1</p>
-      <h2 id="surahArabic" dir="rtl">الْفَاتِحَة</h2>
-      <h3 id="surahName">Al-Faatiha</h3>
-      <p id="surahInformation">Loading...</p>
 
-      <button type="button" id="favoriteSurahButton">
-        ☆ Add to Favourite Surahs
-      </button>
-    </section>
+      <div id="surahArabic" class="surah-arabic">
+        الفاتحة
+      </div>
 
-    <!-- FAVOURITES -->
-    <section class="card" id="favouritesSection">
-      <h2 class="section-title">My Favourites ♥</h2>
-      <p class="section-description">
-        Keep meaningful ayat and surahs close to your heart.
+      <h2 id="surahName">Al-Fatihah</h2>
+
+      <p id="surahInformation">
+        Loading Surah information...
       </p>
 
-      <div class="font-controls">
-        <button type="button" id="favAyatTab">
-          Favourite Ayat
-        </button>
-
-        <button type="button" id="favSurahsTab">
-          Favourite Surahs
-        </button>
-      </div>
-
-      <div id="favAyatPanel">
-        <h3>My Favourite Ayat</h3>
-        <div id="favAyatList">
-          <p>No favourite ayat saved yet.</p>
-        </div>
-      </div>
-
-      <div id="favSurahsPanel" hidden>
-        <h3>My Favourite Surahs</h3>
-        <div id="favSurahsList">
-          <p>No favourite surahs saved yet.</p>
-        </div>
-      </div>
     </section>
 
-    <!-- QURAN TEXT -->
-    <div id="readerStatus" class="reader-status">
-      Loading Quran...
-    </div>
+    <!-- READING STATUS -->
+    <p id="readerStatus" class="reader-status">
+      Preparing Quran Reader...
+    </p>
 
-    <section id="ayahContainer"></section>
+    <!-- MUSHAF CONTENT -->
+    <section id="ayahContainer">
+
+      <div class="mushaf-page">
+        <p class="mushaf-arabic" dir="rtl">
+          Loading Quran...
+        </p>
+      </div>
+
+    </section>
 
     <!-- SURAH NAVIGATION -->
-    <section class="card reader-navigation">
+    <div class="reader-navigation">
+
       <button type="button" id="previousSurah">
         ← Previous Surah
       </button>
@@ -105,31 +257,37 @@
       <button type="button" id="nextSurah">
         Next Surah →
       </button>
-    </section>
 
-    <!-- SOURCE -->
-    <section class="card source-note">
-      <p>Quran text and translations provided by AlQuran Cloud.</p>
-      <p>
-        Arabic text: Uthmani script.<br>
-        Malay translation: Abdullah Muhammad Basmeih.<br>
-        English translation: Saheeh International.
-      </p>
-      <a href="https://alquran.cloud/credits"
-         target="_blank" rel="noopener">
-        View Quran content credits
-      </a>
-    </section>
+    </div>
+
+    <p class="small-note">
+      Reading progress is estimated from the Quran text visible on your screen.
+      It does not confirm recitation.
+    </p>
 
   </main>
 
   <!-- BOTTOM NAVIGATION -->
   <nav class="bottom-nav">
-    <a href="index.html">🏠<span>Home</span></a>
-    <a href="reading.html">📖<span>Reading</span></a>
-    <a href="memorisation.html">🧠<span>Memorise</span></a>
+
+    <a href="index.html">
+      <span>⌂</span>
+      <small>Home</small>
+    </a>
+
+    <a href="reading.html">
+      <span>📖</span>
+      <small>Quran Dashboard</small>
+    </a>
+
+    <a href="memorisation.html">
+      <span>✎</span>
+      <small>Memorise</small>
+    </a>
+
   </nav>
 
   <script src="quran.js"></script>
+
 </body>
 </html>
