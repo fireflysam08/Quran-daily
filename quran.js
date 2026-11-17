@@ -1,19 +1,18 @@
 
 /* =========================================
    QURAN DAILY TRACKER
-   COMPLETE QURAN READER
-   AUTOMATIC READING + FAVOURITES
+   MUSHAF READER
+   AUTOMATIC TRACKING + FAVOURITES
 ========================================= */
 
 const API = "https://api.alquran.cloud/v1";
 
 const ARABIC_EDITION = "quran-uthmani";
 const MALAY_EDITION = "ms.basmeih";
-const ENGLISH_EDITION = "en.sahih";
 
 const POSITION_KEY = "quranReaderPosition";
-const MODE_KEY = "quranReadingMode";
 const FONT_KEY = "quranArabicFontSize";
+const TRANSLATION_KEY = "quranShowMalay";
 
 const READING_KEY = "quranReadingRecords";
 const SESSION_KEY = "quranActiveReadingSession";
@@ -29,7 +28,6 @@ const INACTIVITY_LIMIT = 30 * 60 * 1000;
 // =========================================
 
 const surahSelect = document.getElementById("surahSelect");
-const readingMode = document.getElementById("readingMode");
 const ayahContainer = document.getElementById("ayahContainer");
 const readerStatus = document.getElementById("readerStatus");
 
@@ -48,21 +46,11 @@ const nextSurah = document.getElementById("nextSurah");
 const favoriteSurahButton =
   document.getElementById("favoriteSurahButton");
 
-const favAyatTab = document.getElementById("favAyatTab");
-const favSurahsTab = document.getElementById("favSurahsTab");
-
-const favAyatPanel = document.getElementById("favAyatPanel");
-const favSurahsPanel = document.getElementById("favSurahsPanel");
-
-const favAyatList = document.getElementById("favAyatList");
-const favSurahsList = document.getElementById("favSurahsList");
-
 // =========================================
 // READER DATA
 // =========================================
 
 let surahs = [];
-
 let currentSurah = 1;
 let currentAyah = 1;
 
@@ -70,17 +58,18 @@ let currentFontSize = Number(
   localStorage.getItem(FONT_KEY) || 30
 );
 
+let showMalay =
+  localStorage.getItem(TRANSLATION_KEY) === "true";
+
 let currentData = {
   arabic: [],
-  malay: [],
-  english: []
+  malay: []
 };
 
 let loadingSurah = false;
-
 let ayahObserver = null;
-let visibilityTimers = new Map();
 
+let visibilityTimers = new Map();
 let hasReadingInteraction = false;
 
 // =========================================
@@ -113,25 +102,31 @@ async function fetchJSON(url) {
   return result.data;
 }
 
-function getLocalDate() {
-  return new Date().toLocaleDateString("en-CA");
-}
-
-function getRecords() {
+function getRecords(key) {
   try {
-    return JSON.parse(
-      localStorage.getItem(READING_KEY) || "[]"
-    );
+    return JSON.parse(localStorage.getItem(key) || "[]");
   } catch {
     return [];
   }
 }
 
-function saveRecords(records) {
-  localStorage.setItem(
-    READING_KEY,
-    JSON.stringify(records)
-  );
+function saveRecords(key, records) {
+  localStorage.setItem(key, JSON.stringify(records));
+}
+
+// Use the device's local date and time.
+function getDeviceDate() {
+  const now = new Date();
+
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+
+function getDeviceTimestamp() {
+  return new Date().toISOString();
 }
 
 function savePosition() {
@@ -153,6 +148,54 @@ function restorePosition() {
   } catch {
     return { surah: 1, ayah: 1 };
   }
+}
+
+// =========================================
+// MUSHAF TRANSLATION CONTROL
+// =========================================
+
+function createTranslationControl() {
+  // Remove the old reading-mode selector.
+  document.querySelectorAll(
+    'label[for="readingMode"], #readingMode'
+  ).forEach(element => {
+    element.hidden = true;
+  });
+
+  const controls = document.querySelector(".app > .card");
+
+  if (!controls || document.getElementById("translationToggle")) {
+    return;
+  }
+
+  const wrapper = document.createElement("div");
+  wrapper.className = "translation-control";
+
+  wrapper.innerHTML = `
+    <button type="button" id="translationToggle">
+      ${showMalay ? "Hide Malay Translation" : "Show Malay Translation"}
+    </button>
+  `;
+
+  controls.appendChild(wrapper);
+
+  document.getElementById("translationToggle")
+    .addEventListener("click", function() {
+
+      showMalay = !showMalay;
+
+      localStorage.setItem(
+        TRANSLATION_KEY,
+        String(showMalay)
+      );
+
+      this.textContent = showMalay
+        ? "Hide Malay Translation"
+        : "Show Malay Translation";
+
+      renderMushaf();
+      startAutomaticTracking();
+    });
 }
 
 // =========================================
@@ -187,7 +230,7 @@ function getActiveSession() {
 }
 
 function createSession() {
-  const now = new Date().toISOString();
+  const now = getDeviceTimestamp();
 
   const session = {
     id: "reading-" + Date.now(),
@@ -203,36 +246,41 @@ function createSession() {
   return session;
 }
 
+// =========================================
+// SAVE AUTOMATIC READING RECORD
+// =========================================
+
 function trackReadAyah(ayah) {
+
   let session = getActiveSession();
 
   if (!session) {
     session = createSession();
   }
 
-  session.lastActivity = new Date().toISOString();
+  session.lastActivity = getDeviceTimestamp();
 
   localStorage.setItem(
     SESSION_KEY,
     JSON.stringify(session)
   );
 
-  const now = new Date().toISOString();
-  const records = getRecords();
+  const records = getRecords(READING_KEY);
 
   let record = records.find(item =>
     item.sessionId === session.id &&
     Number(item.surahNumber) === currentSurah
   );
 
+  const now = getDeviceTimestamp();
+
   if (!record) {
+
     record = {
       id: session.id + "-surah-" + currentSurah,
       sessionId: session.id,
 
-      surah: surahs[currentSurah - 1]?.englishName ||
-        "Surah " + currentSurah,
-
+      surah: surahs[currentSurah - 1].englishName,
       surahNumber: currentSurah,
 
       startAyah: ayah.numberInSurah,
@@ -242,7 +290,7 @@ function trackReadAyah(ayah) {
       pages: [],
       juz: [],
 
-      date: getLocalDate(),
+      date: getDeviceDate(),
       startedAt: session.startedAt,
       savedAt: now,
 
@@ -252,34 +300,23 @@ function trackReadAyah(ayah) {
     records.push(record);
   }
 
-  // Save ayah only once.
+  // Avoid counting the same ayah twice.
   if (!record.ayahsRead.includes(ayah.numberInSurah)) {
     record.ayahsRead.push(ayah.numberInSurah);
   }
 
   record.ayahsRead.sort((a, b) => a - b);
 
-  record.startAyah = Math.min(
-    ...record.ayahsRead
-  );
+  record.startAyah = Math.min(...record.ayahsRead);
+  record.endAyah = Math.max(...record.ayahsRead);
 
-  record.endAyah = Math.max(
-    ...record.ayahsRead
-  );
-
-  // Save Quran page automatically.
-  if (
-    ayah.page &&
-    !record.pages.includes(ayah.page)
-  ) {
+  // Actual Quran page number.
+  if (ayah.page && !record.pages.includes(ayah.page)) {
     record.pages.push(ayah.page);
   }
 
-  // Save Juz automatically.
-  if (
-    ayah.juz &&
-    !record.juz.includes(ayah.juz)
-  ) {
+  // Actual Quran Juz number.
+  if (ayah.juz && !record.juz.includes(ayah.juz)) {
     record.juz.push(ayah.juz);
   }
 
@@ -288,7 +325,7 @@ function trackReadAyah(ayah) {
 
   record.savedAt = now;
 
-  saveRecords(records);
+  saveRecords(READING_KEY, records);
 
   currentAyah = ayah.numberInSurah;
   savePosition();
@@ -298,13 +335,11 @@ function trackReadAyah(ayah) {
 }
 
 // =========================================
-// READING INTERACTION
+// USER READING INTERACTION
 // =========================================
 
-// Opening the reader alone does not start tracking.
-// Scrolling activates the automatic ayah detector.
-
 function activateReadingTracking() {
+
   if (hasReadingInteraction) return;
 
   hasReadingInteraction = true;
@@ -313,28 +348,40 @@ function activateReadingTracking() {
 }
 
 window.addEventListener(
-  "scroll",
-  activateReadingTracking,
-  { passive: true }
-);
-
-window.addEventListener(
-  "touchstart",
-  activateReadingTracking,
-  { passive: true }
-);
-
-window.addEventListener(
   "wheel",
   activateReadingTracking,
   { passive: true }
 );
+
+window.addEventListener(
+  "touchmove",
+  activateReadingTracking,
+  { passive: true }
+);
+
+document.addEventListener("keydown", event => {
+
+  if (
+    ["ArrowDown", "ArrowUp", "PageDown", "PageUp", " "]
+      .includes(event.key)
+  ) {
+    activateReadingTracking();
+  }
+});
+
+ayahContainer.addEventListener("pointerdown", event => {
+
+  if (event.target.closest(".mushaf-ayah")) {
+    activateReadingTracking();
+  }
+});
 
 // =========================================
 // AUTOMATIC AYAH DETECTION
 // =========================================
 
 function stopVisibilityTimers() {
+
   visibilityTimers.forEach(timer => {
     clearTimeout(timer);
   });
@@ -343,19 +390,20 @@ function stopVisibilityTimers() {
 }
 
 function startAutomaticTracking() {
+
   if (ayahObserver) {
     ayahObserver.disconnect();
   }
 
   stopVisibilityTimers();
 
+  if (!hasReadingInteraction) return;
+
   if (!("IntersectionObserver" in window)) {
     readerStatus.textContent =
-      "Automatic tracking is not supported by this browser.";
+      "Automatic tracking is unavailable in this browser.";
     return;
   }
-
-  if (!hasReadingInteraction) return;
 
   ayahObserver = new IntersectionObserver(entries => {
 
@@ -366,7 +414,7 @@ function startAutomaticTracking() {
 
       if (
         entry.isIntersecting &&
-        entry.intersectionRatio >= 0.25
+        entry.intersectionRatio >= 0.5
       ) {
 
         if (visibilityTimers.has(number)) return;
@@ -410,22 +458,23 @@ function startAutomaticTracking() {
     });
 
   }, {
-    threshold: [0.25, 0.5, 0.75]
+    threshold: [0.5, 0.75]
   });
 
-  document.querySelectorAll(".quran-ayah").forEach(element => {
+  document.querySelectorAll(".mushaf-ayah").forEach(element => {
     ayahObserver.observe(element);
   });
 }
 
 // =========================================
-// LOAD ALL 114 SURAHS
+// LOAD ALL SURAHS
 // =========================================
 
 async function loadSurahs() {
+
   try {
-    readerStatus.textContent =
-      "Loading all 114 Surahs...";
+
+    readerStatus.textContent = "Loading all 114 Surahs...";
 
     surahs = await fetchJSON(`${API}/surah`);
 
@@ -447,39 +496,31 @@ async function loadSurahs() {
       Number(saved.ayah) || 1
     );
 
-    const savedMode = localStorage.getItem(MODE_KEY);
-
-    if (
-      ["arabic", "malay", "english"].includes(savedMode)
-    ) {
-      readingMode.value = savedMode;
-    }
-
     currentFontSize = Math.min(
       48,
       Math.max(22, currentFontSize)
     );
 
+    createTranslationControl();
     updateFontSize();
-
-    renderFavoriteAyat();
-    renderFavoriteSurahs();
 
     await loadSurah(currentSurah, true);
 
   } catch (error) {
+
     console.error(error);
 
     readerStatus.textContent =
-      "Unable to load Quran. Please check your internet connection.";
+      "Unable to load Quran. Check your internet connection.";
   }
 }
 
 // =========================================
-// LOAD ONE COMPLETE SURAH
+// LOAD ONE SURAH
 // =========================================
 
 async function loadSurah(number, restoreAyah = false) {
+
   if (loadingSurah) return;
 
   loadingSurah = true;
@@ -491,25 +532,29 @@ async function loadSurah(number, restoreAyah = false) {
   stopVisibilityTimers();
 
   try {
+
     readerStatus.textContent = "Loading Surah...";
     ayahContainer.innerHTML = "";
 
-    const [arabicData, malayData, englishData] =
-      await Promise.all([
-        fetchJSON(`${API}/surah/${number}/${ARABIC_EDITION}`),
-        fetchJSON(`${API}/surah/${number}/${MALAY_EDITION}`),
-        fetchJSON(`${API}/surah/${number}/${ENGLISH_EDITION}`)
-      ]);
+    const [arabicData, malayData] = await Promise.all([
+
+      fetchJSON(
+        `${API}/surah/${number}/${ARABIC_EDITION}`
+      ),
+
+      fetchJSON(
+        `${API}/surah/${number}/${MALAY_EDITION}`
+      )
+
+    ]);
 
     currentData.arabic = arabicData.ayahs;
     currentData.malay = malayData.ayahs;
-    currentData.english = englishData.ayahs;
 
     if (
-      currentData.arabic.length !== currentData.malay.length ||
-      currentData.arabic.length !== currentData.english.length
+      currentData.arabic.length !== currentData.malay.length
     ) {
-      throw new Error("Quran edition verse counts do not match.");
+      throw new Error("Arabic and Malay ayah counts do not match.");
     }
 
     currentSurah = number;
@@ -535,7 +580,7 @@ async function loadSurah(number, restoreAyah = false) {
       );
     }
 
-    renderAyahs();
+    renderMushaf();
 
     updateFavoriteSurahButton();
 
@@ -553,96 +598,123 @@ async function loadSurah(number, restoreAyah = false) {
     }
 
   } catch (error) {
+
     console.error(error);
 
     readerStatus.textContent =
       "Unable to load this Surah. Please try again.";
 
   } finally {
+
     loadingSurah = false;
   }
 }
 
 // =========================================
-// DISPLAY AYAH TEXT
+// MUSHAF PAGE RENDERING
+// Arabic continuous, translation ayah by ayah
 // =========================================
 
-function renderAyahs() {
-  const mode = readingMode.value;
+function renderMushaf() {
 
-  const arabic = currentData.arabic;
-  const malay = currentData.malay;
-  const english = currentData.english;
+  const pages = new Map();
 
-  ayahContainer.innerHTML = arabic.map((ayah, index) => {
+  currentData.arabic.forEach((ayah, index) => {
 
-    const malayText = malay[index]?.text || "";
-    const englishText = english[index]?.text || "";
+    const pageNumber = ayah.page || 1;
 
-    const favourite = isFavoriteAyah(
-      currentSurah,
-      ayah.numberInSurah
-    );
+    if (!pages.has(pageNumber)) {
+      pages.set(pageNumber, []);
+    }
 
-    return `
-      <article
-        class="quran-ayah ${
-          ayah.numberInSurah === currentAyah
-            ? "selected-ayah" : ""
-        }"
-        id="ayah-${ayah.numberInSurah}"
-        data-ayah="${ayah.numberInSurah}"
-      >
+    pages.get(pageNumber).push({
+      arabic: ayah,
+      malay: currentData.malay[index]
+    });
+  });
 
-        <div class="ayah-number">
-          <span>Ayah ${ayah.numberInSurah}</span>
+  ayahContainer.innerHTML = Array.from(pages.entries())
+    .map(([pageNumber, items]) => {
 
-          <button
-            type="button"
-            class="bookmark-button"
-            onclick="toggleFavoriteAyah(
-              ${currentSurah},
-              ${ayah.numberInSurah}
-            )"
-            id="fav-ayah-${ayah.numberInSurah}"
-            aria-label="Add or remove favourite ayah"
-          >
-            ${favourite ? "♥" : "♡"}
-          </button>
-        </div>
+      const arabicContent = items.map(item => {
 
-        <p class="arabic-text" dir="rtl">
-          ${escapeHTML(ayah.text)}
-          <span class="arabic-ayah-number">
-            ﴿${ayah.numberInSurah}﴾
+        const ayahNumber = item.arabic.numberInSurah;
+        const favorite = isFavoriteAyah(
+          currentSurah,
+          ayahNumber
+        );
+
+        return `
+          <span
+            class="mushaf-ayah ${
+              ayahNumber === currentAyah ? "selected-ayah" : ""
+            }"
+            id="ayah-${ayahNumber}"
+            data-ayah="${ayahNumber}"
+          >${escapeHTML(item.arabic.text)}
+            <span class="arabic-ayah-number">
+              ﴿${ayahNumber}﴾
+            </span>
+            <button
+              type="button"
+              class="mushaf-favorite-button"
+              onclick="toggleFavoriteAyah(
+                ${currentSurah},
+                ${ayahNumber}
+              )"
+              id="fav-ayah-${ayahNumber}"
+              aria-label="Favourite ayah ${ayahNumber}"
+            >${favorite ? "♥" : "♡"}</button>
           </span>
-        </p>
+        `;
 
-        ${mode === "malay" ? `
-          <p class="translation-text" lang="ms">
-            ${escapeHTML(malayText)}
+      }).join(" ");
+
+      const translationContent = showMalay
+        ? `
+          <div class="mushaf-translations">
+            ${items.map(item => `
+              <div class="translation-line">
+                <strong>
+                  Ayah ${item.arabic.numberInSurah}
+                </strong>
+                <p lang="ms">
+                  ${escapeHTML(item.malay?.text || "")}
+                </p>
+              </div>
+            `).join("")}
+          </div>
+        `
+        : "";
+
+      return `
+        <section class="mushaf-page" data-page="${pageNumber}">
+
+          <div class="mushaf-page-number">
+            Page ${pageNumber}
+          </div>
+
+          <p class="mushaf-arabic" dir="rtl">
+            ${arabicContent}
           </p>
-        ` : ""}
 
-        ${mode === "english" ? `
-          <p class="translation-text" lang="en">
-            ${escapeHTML(englishText)}
-          </p>
-        ` : ""}
+          ${translationContent}
 
-      </article>
-    `;
-  }).join("");
+        </section>
+      `;
+
+    }).join("");
 
   applyFontSize();
 }
 
 // =========================================
-// SELECT AND HIGHLIGHT AYAH
+// HIGHLIGHT AND SELECT AYAH
 // =========================================
 
 function highlightAyah(number) {
-  document.querySelectorAll(".quran-ayah").forEach(element => {
+
+  document.querySelectorAll(".mushaf-ayah").forEach(element => {
     element.classList.remove("selected-ayah");
   });
 
@@ -654,6 +726,7 @@ function highlightAyah(number) {
 }
 
 function selectAyah(number) {
+
   currentAyah = number;
 
   savePosition();
@@ -661,6 +734,7 @@ function selectAyah(number) {
 }
 
 function scrollToCurrentAyah() {
+
   const element = document.getElementById(
     `ayah-${currentAyah}`
   );
@@ -672,22 +746,6 @@ function scrollToCurrentAyah() {
     });
   }
 }
-
-// =========================================
-// READING MODE
-// =========================================
-
-readingMode.addEventListener("change", function() {
-
-  localStorage.setItem(MODE_KEY, this.value);
-
-  renderAyahs();
-  scrollToCurrentAyah();
-
-  if (hasReadingInteraction) {
-    startAutomaticTracking();
-  }
-});
 
 // =========================================
 // SURAH NAVIGATION
@@ -738,9 +796,8 @@ function updateFontSize() {
 
 function applyFontSize() {
 
-  document.querySelectorAll(".arabic-text").forEach(element => {
-    element.style.fontSize =
-      `${currentFontSize}px`;
+  document.querySelectorAll(".mushaf-arabic").forEach(element => {
+    element.style.fontSize = `${currentFontSize}px`;
   });
 }
 
@@ -765,20 +822,11 @@ decreaseFont.addEventListener("click", function() {
 // =========================================
 
 function getFavoriteAyat() {
-  try {
-    return JSON.parse(
-      localStorage.getItem(FAV_AYAT_KEY) || "[]"
-    );
-  } catch {
-    return [];
-  }
+  return getRecords(FAV_AYAT_KEY);
 }
 
 function saveFavoriteAyat(items) {
-  localStorage.setItem(
-    FAV_AYAT_KEY,
-    JSON.stringify(items)
-  );
+  saveRecords(FAV_AYAT_KEY, items);
 }
 
 function isFavoriteAyah(surah, ayah) {
@@ -793,14 +841,14 @@ function toggleFavoriteAyah(surah, ayah) {
 
   const favorites = getFavoriteAyat();
 
-  const existing = favorites.findIndex(item =>
+  const index = favorites.findIndex(item =>
     Number(item.surahNumber) === Number(surah) &&
     Number(item.ayahNumber) === Number(ayah)
   );
 
-  if (existing >= 0) {
+  if (index >= 0) {
 
-    favorites.splice(existing, 1);
+    favorites.splice(index, 1);
 
   } else {
 
@@ -812,32 +860,35 @@ function toggleFavoriteAyah(surah, ayah) {
       item.numberInSurah === ayah
     );
 
-    const english = currentData.english.find(item =>
-      item.numberInSurah === ayah
-    );
-
-    if (
-      Number(surah) !== currentSurah ||
-      !arabic
-    ) {
-      return;
-    }
+    if (!arabic || !malay) return;
 
     favorites.push({
+
+      id: `fav-${surah}-${ayah}`,
+
       surahNumber: surah,
       surahName: surahs[surah - 1].englishName,
+
       ayahNumber: ayah,
+
       arabic: arabic.text,
-      malay: malay?.text || "",
-      english: english?.text || "",
-      savedAt: new Date().toISOString()
+      malay: malay.text,
+
+      page: arabic.page,
+      juz: arabic.juz,
+
+      savedAt: getDeviceTimestamp()
     });
   }
 
   saveFavoriteAyat(favorites);
 
-  renderFavoriteAyat();
   updateFavoriteAyahButton(surah, ayah);
+
+  // Notify the dashboard if it is open in another tab.
+  window.dispatchEvent(
+    new CustomEvent("quran-favourites-updated")
+  );
 }
 
 function updateFavoriteAyahButton(surah, ayah) {
@@ -854,90 +905,16 @@ function updateFavoriteAyahButton(surah, ayah) {
   }
 }
 
-function renderFavoriteAyat() {
-
-  if (!favAyatList) return;
-
-  const favorites = getFavoriteAyat();
-
-  if (!favorites.length) {
-    favAyatList.innerHTML =
-      "<p>No favourite ayat saved yet.</p>";
-    return;
-  }
-
-  favAyatList.innerHTML = favorites.map(item => `
-
-    <div class="history-item">
-
-      <h3>
-        ${escapeHTML(item.surahName)}
-        · Ayah ${item.ayahNumber}
-      </h3>
-
-      <p dir="rtl" class="arabic-text">
-        ${escapeHTML(item.arabic)}
-      </p>
-
-      <p>${escapeHTML(item.malay)}</p>
-
-      <button
-        type="button"
-        onclick="openFavoriteAyah(
-          ${item.surahNumber},
-          ${item.ayahNumber}
-        )"
-      >
-        Read Ayah
-      </button>
-
-      <button
-        type="button"
-        onclick="toggleFavoriteAyah(
-          ${item.surahNumber},
-          ${item.ayahNumber}
-        )"
-      >
-        Remove ♥
-      </button>
-
-    </div>
-
-  `).join("");
-
-  applyFontSize();
-}
-
-async function openFavoriteAyah(surah, ayah) {
-
-  currentAyah = ayah;
-
-  await loadSurah(surah, true);
-
-  scrollToCurrentAyah();
-}
-
 // =========================================
 // FAVOURITE SURAHS
 // =========================================
 
 function getFavoriteSurahs() {
-
-  try {
-    return JSON.parse(
-      localStorage.getItem(FAV_SURAHS_KEY) || "[]"
-    );
-  } catch {
-    return [];
-  }
+  return getRecords(FAV_SURAHS_KEY);
 }
 
 function saveFavoriteSurahs(items) {
-
-  localStorage.setItem(
-    FAV_SURAHS_KEY,
-    JSON.stringify(items)
-  );
+  saveRecords(FAV_SURAHS_KEY, items);
 }
 
 function isFavoriteSurah(number) {
@@ -956,18 +933,18 @@ function toggleFavoriteSurah() {
   );
 
   if (index >= 0) {
-
     favorites.splice(index, 1);
-
   } else {
-
     favorites.push(currentSurah);
   }
 
   saveFavoriteSurahs(favorites);
 
-  renderFavoriteSurahs();
   updateFavoriteSurahButton();
+
+  window.dispatchEvent(
+    new CustomEvent("quran-favourites-updated")
+  );
 }
 
 function updateFavoriteSurahButton() {
@@ -980,103 +957,7 @@ function updateFavoriteSurahButton() {
       : "♡ Add to Favourite Surahs";
 }
 
-function renderFavoriteSurahs() {
-
-  if (!favSurahsList) return;
-
-  const favorites = getFavoriteSurahs();
-
-  if (!favorites.length) {
-    favSurahsList.innerHTML =
-      "<p>No favourite surahs saved yet.</p>";
-    return;
-  }
-
-  favSurahsList.innerHTML = favorites.map(number => {
-
-    const surah = surahs[number - 1];
-
-    if (!surah) return "";
-
-    return `
-
-      <div class="history-item">
-
-        <h3>
-          ${number}. ${escapeHTML(surah.englishName)}
-        </h3>
-
-        <p dir="rtl" class="arabic-text">
-          ${escapeHTML(surah.name)}
-        </p>
-
-        <button
-          type="button"
-          onclick="openFavoriteSurah(${number})"
-        >
-          Read Surah
-        </button>
-
-        <button
-          type="button"
-          onclick="removeFavoriteSurah(${number})"
-        >
-          Remove ♥
-        </button>
-
-      </div>
-
-    `;
-
-  }).join("");
-
-  applyFontSize();
-}
-
-function openFavoriteSurah(number) {
-
-  currentAyah = 1;
-  loadSurah(number);
-}
-
-function removeFavoriteSurah(number) {
-
-  const favorites = getFavoriteSurahs().filter(item =>
-    Number(item) !== Number(number)
-  );
-
-  saveFavoriteSurahs(favorites);
-
-  renderFavoriteSurahs();
-  updateFavoriteSurahButton();
-}
-
-// =========================================
-// FAVOURITE TABS
-// =========================================
-
-if (favAyatTab && favAyatPanel && favSurahsPanel) {
-
-  favAyatTab.addEventListener("click", function() {
-
-    favAyatPanel.hidden = false;
-    favSurahsPanel.hidden = true;
-
-  });
-}
-
-if (favSurahsTab && favAyatPanel && favSurahsPanel) {
-
-  favSurahsTab.addEventListener("click", function() {
-
-    favAyatPanel.hidden = true;
-    favSurahsPanel.hidden = false;
-
-  });
-}
-
 if (favoriteSurahButton) {
-
   favoriteSurahButton.addEventListener(
     "click",
     toggleFavoriteSurah
