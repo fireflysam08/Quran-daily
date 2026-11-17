@@ -56,29 +56,103 @@
       </div>
     </section>
 
-    <h2 class="section-title" style="margin-top:28px">
-      Today's Reading
-    </h2>
+    
+<h2 class="section-title" style="margin-top:28px">
+  Record Your Reading
+</h2>
 
-    <section class="card">
-      <p style="font-size:13px;color:#85877F">
-        Last reading session
-      </p>
+<section class="card">
+  <form id="readingForm">
 
-      <h2 style="margin:10px 0">
-        Surah Al-Baqarah
-      </h2>
+    <label for="readingDate">Reading Date</label>
+    <input type="date" id="readingDate" required>
 
-      <p style="font-size:13px;color:#85877F">
-        Ayat 1 – 20 · 5 Pages
-      </p>
+    <label for="surah">Surah</label>
+    <input type="text" id="surah"
+      placeholder="Example: Al-Baqarah" required>
 
-      <button style="margin-top:18px;width:100%"
-        onclick="alert('Reading tracker coming soon!')">
-        + Record Reading
-      </button>
-    </section>
+    <div class="form-row">
+      <div>
+        <label for="startAyah">Start Ayah</label>
+        <input type="number" id="startAyah"
+          min="1" required>
+      </div>
 
+      <div>
+        <label for="endAyah">End Ayah</label>
+        <input type="number" id="endAyah"
+          min="1" required>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div>
+        <label for="pages">Pages Read</label>
+        <input type="number" id="pages"
+          min="1" required>
+      </div>
+
+      <div>
+        <label for="juz">Juz</label>
+        <select id="juz" required>
+          <option value="">Select Juz</option>
+          <option value="1">Juz 1</option>
+          <option value="2">Juz 2</option>
+          <option value="3">Juz 3</option>
+          <option value="4">Juz 4</option>
+          <option value="5">Juz 5</option>
+          <option value="6">Juz 6</option>
+          <option value="7">Juz 7</option>
+          <option value="8">Juz 8</option>
+          <option value="9">Juz 9</option>
+          <option value="10">Juz 10</option>
+          <option value="11">Juz 11</option>
+          <option value="12">Juz 12</option>
+          <option value="13">Juz 13</option>
+          <option value="14">Juz 14</option>
+          <option value="15">Juz 15</option>
+          <option value="16">Juz 16</option>
+          <option value="17">Juz 17</option>
+          <option value="18">Juz 18</option>
+          <option value="19">Juz 19</option>
+          <option value="20">Juz 20</option>
+          <option value="21">Juz 21</option>
+          <option value="22">Juz 22</option>
+          <option value="23">Juz 23</option>
+          <option value="24">Juz 24</option>
+          <option value="25">Juz 25</option>
+          <option value="26">Juz 26</option>
+          <option value="27">Juz 27</option>
+          <option value="28">Juz 28</option>
+          <option value="29">Juz 29</option>
+          <option value="30">Juz 30</option>
+        </select>
+      </div>
+    </div>
+
+    <label for="duration">Reading Duration (minutes)</label>
+    <input type="number" id="duration"
+      min="1" placeholder="Example: 20">
+
+    <label for="notes">Notes (Optional)</label>
+    <textarea id="notes"
+      placeholder="Reflection or notes..."></textarea>
+
+    <button type="submit" style="width:100%;margin-top:20px">
+      Save Reading
+    </button>
+
+  </form>
+</section>
+
+<h2 class="section-title">Reading History</h2>
+
+<section class="card" id="readingHistory">
+  <p style="color:#85877F;font-size:13px">
+    Your reading records will appear here.
+  </p>
+</section>
+    
     <h2 class="section-title">Daily Reminder</h2>
 
     <section class="card">
