@@ -1,112 +1,401 @@
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#F7F6F0">
-  <title>Quran Reader | Quran Daily Tracker</title>
-  <link rel="stylesheet" href="style.css">
-</head>
+/* =====================================
+   QURAN DAILY TRACKER
+   QURAN READER
+===================================== */
 
-<body>
+const API = "https://api.alquran.cloud/v1";
 
-  <main class="app">
+const ARABIC_EDITION = "quran-uthmani";
+const MALAY_EDITION = "ms.basmeih";
+const ENGLISH_EDITION = "en.sahih";
 
-    <header>
-      <div>
-        <p class="greeting">Your Daily Quran Reading 🌙</p>
-        <h1>Quran Reader</h1>
-        <p class="date">Read, reflect and reconnect.</p>
-      </div>
-      <div>📖</div>
-    </header>
+const POSITION_KEY = "quranReaderPosition";
+const MODE_KEY = "quranReadingMode";
+const FONT_KEY = "quranArabicFontSize";
 
-    <nav class="main-nav">
-      <a href="index.html" class="nav-link">Home</a>
-      <a href="reading.html" class="nav-link active">Reading</a>
-      <a href="memorisation.html" class="nav-link">Memorisation</a>
-    </nav>
+// Reader elements
+const surahSelect = document.getElementById("surahSelect");
+const readingMode = document.getElementById("readingMode");
+const ayahContainer = document.getElementById("ayahContainer");
+const readerStatus = document.getElementById("readerStatus");
 
-    <!-- READER CONTROLS -->
-    <section class="card">
+const surahNumber = document.getElementById("surahNumber");
+const surahArabic = document.getElementById("surahArabic");
+const surahName = document.getElementById("surahName");
+const surahInformation = document.getElementById("surahInformation");
 
-      <h2 class="section-title">Choose Your Reading</h2>
+const fontSizeLabel = document.getElementById("fontSizeLabel");
+const decreaseFont = document.getElementById("decreaseFont");
+const increaseFont = document.getElementById("increaseFont");
 
-      <label for="surahSelect">Select Surah</label>
-      <select id="surahSelect">
-        <option value="">Loading Surahs...</option>
-      </select>
+const previousSurah = document.getElementById("previousSurah");
+const nextSurah = document.getElementById("nextSurah");
 
-      <label for="readingMode">Reading Mode</label>
-      <select id="readingMode">
-        <option value="arabic">Arabic Only</option>
-        <option value="malay" selected>Arabic + Malay</option>
-        <option value="english">Arabic + English</option>
-      </select>
+// Reader data
+let surahs = [];
+let currentSurah = 1;
+let currentAyah = 1;
+let currentFontSize = Number(
+  localStorage.getItem(FONT_KEY) || 30
+);
 
-      <label for="fontSize">Arabic Font Size</label>
-      <div class="font-controls">
-        <button type="button" id="decreaseFont">A−</button>
-        <span id="fontSizeLabel">30 px</span>
-        <button type="button" id="increaseFont">A+</button>
-      </div>
+let currentData = {
+  arabic: [],
+  malay: [],
+  english: []
+};
 
-    </section>
+let loadingSurah = false;
 
-    <!-- SURAH INFORMATION -->
-    <section class="card surah-heading">
-      <p id="surahNumber">Surah 1</p>
-      <h2 id="surahArabic" dir="rtl">الْفَاتِحَة</h2>
-      <h3 id="surahName">Al-Faatiha</h3>
-      <p id="surahInformation">Loading...</p>
-    </section>
+/* =====================================
+   HELPER FUNCTIONS
+===================================== */
 
-    <!-- AYAH CONTENT -->
-    <div id="readerStatus" class="reader-status">
-      Loading Quran...
-    </div>
+function escapeHTML(value) {
+  return String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  })[char]);
+}
 
-    <section id="ayahContainer"></section>
+async function fetchJSON(url) {
+  const response = await fetch(url);
 
-    <!-- READER NAVIGATION -->
-    <section class="card reader-navigation">
+  if (!response.ok) {
+    throw new Error("Unable to load Quran data.");
+  }
 
-      <button type="button" id="previousSurah">
-        ← Previous Surah
-      </button>
+  const result = await response.json();
 
-      <button type="button" id="nextSurah">
-        Next Surah →
-      </button>
+  if (result.code !== 200 || !result.data) {
+    throw new Error("Invalid Quran data response.");
+  }
 
-    </section>
+  return result.data;
+}
 
-    <!-- SOURCE ATTRIBUTION -->
-    <section class="card source-note">
-      <p>
-        Quran text and translations provided by AlQuran Cloud.
-      </p>
-      <p>
-        Arabic text: Uthmani script.
-        Malay translation: Abdullah Muhammad Basmeih.
-        English translation: Saheeh International.
-      </p>
-      <a href="https://alquran.cloud/credits"
-         target="_blank" rel="noopener">
-        View Quran content credits
-      </a>
-    </section>
+function savePosition() {
+  localStorage.setItem(
+    POSITION_KEY,
+    JSON.stringify({
+      surah: currentSurah,
+      ayah: currentAyah
+    })
+  );
+}
 
-  </main>
+function restorePosition() {
+  try {
+    return JSON.parse(
+      localStorage.getItem(POSITION_KEY) ||
+      '{"surah":1,"ayah":1}'
+    );
+  } catch {
+    return { surah: 1, ayah: 1 };
+  }
+}
 
-  <nav class="bottom-nav">
-    <a href="index.html">🏠<span>Home</span></a>
-    <a href="reading.html">📖<span>Reading</span></a>
-    <a href="memorisation.html">🧠<span>Memorise</span></a>
-  </nav>
+/* =====================================
+   LOAD SURAH LIST
+===================================== */
 
-  <script src="quran.js"></script>
+async function loadSurahs() {
+  try {
+    readerStatus.textContent = "Loading all 114 Surahs...";
 
-</body>
-</html>
+    surahs = await fetchJSON(`${API}/surah`);
+
+    surahSelect.innerHTML = surahs.map(surah => `
+      <option value="${surah.number}">
+        ${surah.number}. ${escapeHTML(surah.englishName)}
+      </option>
+    `).join("");
+
+    const saved = restorePosition();
+
+    currentSurah = Math.min(
+      114,
+      Math.max(1, Number(saved.surah) || 1)
+    );
+
+    currentAyah = Math.max(
+      1,
+      Number(saved.ayah) || 1
+    );
+
+    const savedMode = localStorage.getItem(MODE_KEY);
+
+    if (["arabic", "malay", "english"].includes(savedMode)) {
+      readingMode.value = savedMode;
+    }
+
+    currentFontSize = Math.min(
+      48,
+      Math.max(22, currentFontSize)
+    );
+
+    updateFontSize();
+
+    await loadSurah(currentSurah, true);
+
+  } catch (error) {
+    console.error(error);
+
+    readerStatus.textContent =
+      "Unable to load Quran. Please check your internet connection and try again.";
+  }
+}
+
+/* =====================================
+   LOAD ONE COMPLETE SURAH
+===================================== */
+
+async function loadSurah(number, restoreAyah = false) {
+  if (loadingSurah) return;
+
+  loadingSurah = true;
+
+  try {
+    readerStatus.textContent = "Loading Surah...";
+    ayahContainer.innerHTML = "";
+
+    const [arabicData, malayData, englishData] =
+      await Promise.all([
+        fetchJSON(`${API}/surah/${number}/${ARABIC_EDITION}`),
+        fetchJSON(`${API}/surah/${number}/${MALAY_EDITION}`),
+        fetchJSON(`${API}/surah/${number}/${ENGLISH_EDITION}`)
+      ]);
+
+    currentData.arabic = arabicData.ayahs;
+    currentData.malay = malayData.ayahs;
+    currentData.english = englishData.ayahs;
+
+    if (
+      currentData.arabic.length !== currentData.malay.length ||
+      currentData.arabic.length !== currentData.english.length
+    ) {
+      throw new Error("Quran edition verse counts do not match.");
+    }
+
+    currentSurah = number;
+
+    const info = surahs[number - 1];
+
+    surahSelect.value = number;
+
+    surahNumber.textContent = `Surah ${number}`;
+
+    surahArabic.textContent = info.name;
+    surahName.textContent = info.englishName;
+
+    surahInformation.textContent =
+      `${info.englishNameTranslation} · ` +
+      `${info.numberOfAyahs} Ayahs · ${info.revelationType}`;
+
+    if (!restoreAyah) {
+      currentAyah = 1;
+    } else {
+      currentAyah = Math.min(
+        currentAyah,
+        info.numberOfAyahs
+      );
+    }
+
+    renderAyahs();
+
+    readerStatus.textContent =
+      `${info.numberOfAyahs} Ayahs loaded successfully.`;
+
+    savePosition();
+
+    if (restoreAyah) {
+      scrollToCurrentAyah();
+    }
+
+  } catch (error) {
+    console.error(error);
+
+    readerStatus.textContent =
+      "Unable to load this Surah. Please try again.";
+
+  } finally {
+    loadingSurah = false;
+  }
+}
+
+/* =====================================
+   DISPLAY AYAH TEXT
+===================================== */
+
+function renderAyahs() {
+  const mode = readingMode.value;
+
+  const arabic = currentData.arabic;
+  const malay = currentData.malay;
+  const english = currentData.english;
+
+  ayahContainer.innerHTML = arabic.map((ayah, index) => {
+
+    const malayText = malay[index]?.text || "";
+    const englishText = english[index]?.text || "";
+
+    return `
+      <article
+        class="quran-ayah ${ayah.numberInSurah === currentAyah ? "selected-ayah" : ""}"
+        id="ayah-${ayah.numberInSurah}"
+        data-ayah="${ayah.numberInSurah}"
+      >
+
+        <div class="ayah-number">
+          <span>Ayah ${ayah.numberInSurah}</span>
+          <button
+            type="button"
+            class="bookmark-button"
+            onclick="selectAyah(${ayah.numberInSurah})"
+            aria-label="Save reading position at ayah ${ayah.numberInSurah}"
+          >☆</button>
+        </div>
+
+        <p class="arabic-text" dir="rtl">
+          ${escapeHTML(ayah.text)}
+          <span class="arabic-ayah-number">
+            ﴿${ayah.numberInSurah}﴾
+          </span>
+        </p>
+
+        ${mode === "malay" ? `
+          <p class="translation-text" lang="ms">
+            ${escapeHTML(malayText)}
+          </p>
+        ` : ""}
+
+        ${mode === "english" ? `
+          <p class="translation-text" lang="en">
+            ${escapeHTML(englishText)}
+          </p>
+        ` : ""}
+
+      </article>
+    `;
+  }).join("");
+
+  applyFontSize();
+}
+
+/* =====================================
+   SELECT AYAH / SAVE POSITION
+===================================== */
+
+function selectAyah(number) {
+  currentAyah = number;
+
+  savePosition();
+
+  document.querySelectorAll(".quran-ayah").forEach(element => {
+    element.classList.remove("selected-ayah");
+  });
+
+  const selected = document.getElementById(`ayah-${number}`);
+
+  if (selected) {
+    selected.classList.add("selected-ayah");
+  }
+}
+
+function scrollToCurrentAyah() {
+  const element = document.getElementById(
+    `ayah-${currentAyah}`
+  );
+
+  if (element) {
+    element.scrollIntoView({
+      behavior: "smooth",
+      block: "center"
+    });
+  }
+}
+
+/* =====================================
+   READING MODE
+===================================== */
+
+readingMode.addEventListener("change", function() {
+  const previousPosition = currentAyah;
+
+  localStorage.setItem(MODE_KEY, this.value);
+
+  renderAyahs();
+
+  currentAyah = previousPosition;
+  scrollToCurrentAyah();
+  savePosition();
+});
+
+/* =====================================
+   SURAH NAVIGATION
+===================================== */
+
+surahSelect.addEventListener("change", function() {
+  const number = Number(this.value);
+
+  if (number >= 1 && number <= 114) {
+    currentAyah = 1;
+    loadSurah(number);
+  }
+});
+
+previousSurah.addEventListener("click", function() {
+  if (currentSurah > 1) {
+    currentAyah = 1;
+    loadSurah(currentSurah - 1);
+  }
+});
+
+nextSurah.addEventListener("click", function() {
+  if (currentSurah < 114) {
+    currentAyah = 1;
+    loadSurah(currentSurah + 1);
+  }
+});
+
+/* =====================================
+   FONT SIZE
+===================================== */
+
+function updateFontSize() {
+  fontSizeLabel.textContent = `${currentFontSize} px`;
+
+  localStorage.setItem(FONT_KEY, currentFontSize);
+
+  applyFontSize();
+}
+
+function applyFontSize() {
+  document.querySelectorAll(".arabic-text").forEach(element => {
+    element.style.fontSize = `${currentFontSize}px`;
+  });
+}
+
+increaseFont.addEventListener("click", function() {
+  if (currentFontSize < 48) {
+    currentFontSize += 2;
+    updateFontSize();
+  }
+});
+
+decreaseFont.addEventListener("click", function() {
+  if (currentFontSize > 22) {
+    currentFontSize -= 2;
+    updateFontSize();
+  }
+});
+
+/* =====================================
+   START READER
+===================================== */
+
+loadSurahs();
