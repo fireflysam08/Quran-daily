@@ -8,11 +8,8 @@
   <title>Quran Reader | Quran Daily Tracker</title>
   <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-
   <main class="app">
-
     <header>
       <div>
         <p class="greeting">Your Daily Quran Reading 🌙</p>
@@ -22,9 +19,7 @@
       <div>📖</div>
     </header>
 
-    <!-- READER CONTROLS -->
     <section class="card">
-
       <h2 class="section-title">Choose Your Reading</h2>
 
       <label for="surahSelect">Select Surah</label>
@@ -39,16 +34,14 @@
         <option value="english">Arabic + English</option>
       </select>
 
-      <label for="fontSize">Arabic Font Size</label>
+      <label>Arabic Font Size</label>
       <div class="font-controls">
         <button type="button" id="decreaseFont">A−</button>
         <span id="fontSizeLabel">30 px</span>
         <button type="button" id="increaseFont">A+</button>
       </div>
-
     </section>
 
-    <!-- SURAH INFORMATION -->
     <section class="card surah-heading">
       <p id="surahNumber">Surah 1</p>
       <h2 id="surahArabic" dir="rtl">الْفَاتِحَة</h2>
@@ -56,34 +49,22 @@
       <p id="surahInformation">Loading...</p>
     </section>
 
-    <!-- AYAH CONTENT -->
     <div id="readerStatus" class="reader-status">
       Loading Quran...
     </div>
 
     <section id="ayahContainer"></section>
 
-    <!-- READER NAVIGATION -->
     <section class="card reader-navigation">
-
-      <button type="button" id="previousSurah">
-        ← Previous Surah
-      </button>
-
-      <button type="button" id="nextSurah">
-        Next Surah →
-      </button>
-
+      <button type="button" id="previousSurah">← Previous Surah</button>
+      <button type="button" id="nextSurah">Next Surah →</button>
     </section>
 
-    <!-- SOURCE ATTRIBUTION -->
     <section class="card source-note">
+      <p>Quran text and translations provided by AlQuran Cloud.</p>
       <p>
-        Quran text and translations provided by AlQuran Cloud.
-      </p>
-      <p>
-        Arabic text: Uthmani script.
-        Malay translation: Abdullah Muhammad Basmeih.
+        Arabic text: Uthmani script.<br>
+        Malay translation: Abdullah Muhammad Basmeih.<br>
         English translation: Saheeh International.
       </p>
       <a href="https://alquran.cloud/credits"
@@ -91,7 +72,6 @@
         View Quran content credits
       </a>
     </section>
-
   </main>
 
   <nav class="bottom-nav">
@@ -101,6 +81,5 @@
   </nav>
 
   <script src="quran.js"></script>
-
 </body>
 </html>
