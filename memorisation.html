@@ -1,0 +1,167 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#F7F6F0">
+  <title>Memorisation | Quran Daily Tracker</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <main class="app">
+
+    <header>
+      <div>
+        <p class="greeting">My Hifz Journey 🌙</p>
+        <h1>Memorisation</h1>
+        <p class="date" id="today"></p>
+      </div>
+      <div>🧠</div>
+    </header>
+
+    <!-- NAVIGATION -->
+    <nav class="main-nav">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="reading.html" class="nav-link">Reading</a>
+      <a href="memorisation.html" class="nav-link active">Memorisation</a>
+    </nav>
+
+    <!-- PROGRESS -->
+    <section class="card progress-card">
+      <p>My Memorisation Progress</p>
+      <div class="progress-number" id="memorisedCount">
+        0 Ayahs
+      </div>
+
+      <div class="progress-track">
+        <div class="progress-fill" id="memorisationProgress"></div>
+      </div>
+
+      <p style="margin-top:12px;font-size:13px">
+        Keep building your memorisation journey.
+      </p>
+    </section>
+
+    <!-- STATISTICS -->
+    <h2 class="section-title">My Hifz Statistics</h2>
+
+    <section class="stats">
+
+      <div class="stat">
+        <div class="stat-number" id="newAyahCount">0</div>
+        <p class="stat-label">New Ayahs</p>
+      </div>
+
+      <div class="stat">
+        <div class="stat-number" id="revisionCount">0</div>
+        <p class="stat-label">Revised Ayahs</p>
+      </div>
+
+      <div class="stat">
+        <div class="stat-number" id="surahCount">0</div>
+        <p class="stat-label">Surahs Memorised</p>
+      </div>
+
+      <div class="stat">
+        <div class="stat-number" id="testCount">0</div>
+        <p class="stat-label">Tests Completed</p>
+      </div>
+
+    </section>
+
+    <!-- RECORD ACTIVITY -->
+    <h2 class="section-title" style="margin-top:28px">
+      Record Memorisation
+    </h2>
+
+    <section class="card">
+
+      <form id="memorisationForm">
+
+        <label for="memorisationDate">Date</label>
+        <input type="date" id="memorisationDate" required>
+
+        <label for="memoryActivity">Activity</label>
+        <select id="memoryActivity" required>
+          <option value="">Select Activity</option>
+          <option value="New Memorisation">New Memorisation</option>
+          <option value="Revision (Murajaah)">Revision (Murajaah)</option>
+          <option value="Memorisation Test">Memorisation Test</option>
+        </select>
+
+        <label for="memorySurah">Surah</label>
+        <input type="text" id="memorySurah"
+          placeholder="Example: Al-Mulk" required>
+
+        <div class="form-row">
+
+          <div>
+            <label for="memoryStartAyah">Start Ayah</label>
+            <input type="number" id="memoryStartAyah"
+              min="1" required>
+          </div>
+
+          <div>
+            <label for="memoryEndAyah">End Ayah</label>
+            <input type="number" id="memoryEndAyah"
+              min="1" required>
+          </div>
+
+        </div>
+
+        <label for="memoryStatus">Memorisation Status</label>
+        <select id="memoryStatus" required>
+          <option value="">Select Status</option>
+          <option value="Learning">Learning</option>
+          <option value="Memorised">Memorised</option>
+          <option value="Needs Revision">Needs Revision</option>
+          <option value="Well Retained">Well Retained</option>
+        </select>
+
+        <label for="memoryNotes">Notes (Optional)</label>
+        <textarea id="memoryNotes"
+          placeholder="Mistakes, difficulties or reflections..."></textarea>
+
+        <button type="submit"
+          style="width:100%;margin-top:20px">
+          Save Memorisation Record
+        </button>
+
+      </form>
+
+    </section>
+
+    <!-- HISTORY -->
+    <h2 class="section-title">Memorisation History</h2>
+
+    <section class="card" id="memorisationHistory">
+      <p style="color:#85877F;font-size:13px">
+        Your memorisation records will appear here.
+      </p>
+    </section>
+
+  </main>
+
+  <!-- BOTTOM NAVIGATION -->
+  <nav class="bottom-nav">
+    <a href="index.html">🏠<span>Home</span></a>
+    <a href="reading.html">📖<span>Reading</span></a>
+    <a href="memorisation.html">🧠<span>Memorise</span></a>
+  </nav>
+
+  <script>
+    document.getElementById("today").textContent =
+      new Date().toLocaleDateString("en-MY", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric"
+      });
+  </script>
+
+  <script src="app.js"></script>
+
+</body>
+</html>
