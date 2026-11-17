@@ -8,94 +8,117 @@
   <title>Reading Dashboard | Quran Daily Tracker</title>
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
 
+<body>
   <main class="app">
 
     <header>
       <div>
-        <p class="greeting">My Quran Journey</p>
+        <p class="greeting">My Quran Journey 🌙</p>
         <h1>Reading Dashboard</h1>
         <p class="date" id="today"></p>
       </div>
       <div>📖</div>
     </header>
 
+    <!-- KHATAM PROGRESS -->
     <section class="card progress-card">
       <p>My Khatam Progress</p>
-      <div class="progress-number">12 / 30 Juz</div>
-      <div class="progress-track">
-        <div class="progress-fill"></div>
+
+      <div class="progress-number" id="khatamJuz">
+        0 / 30 Juz
       </div>
-      <p style="margin-top:12px;font-size:13px">
-        40% completed
+
+      <div class="progress-track">
+        <div class="progress-fill" id="khatamProgressBar"
+             style="width:0%"></div>
+      </div>
+
+      <p id="khatamPercentage"
+         style="margin-top:12px;font-size:13px">
+        0% completed
       </p>
     </section>
 
-    <h2 class="section-title">Record Your Reading</h2>
-
+    <!-- OPEN QURAN -->
     <section class="card">
-      <form id="readingForm">
+      <h2 class="section-title">Continue Reading</h2>
 
-        <label for="readingDate">Reading Date</label>
-        <input type="date" id="readingDate" required>
+      <p class="section-description">
+        Continue from where you last stopped. Your reading
+        progress is tracked automatically.
+      </p>
 
-        <label for="surah">Surah</label>
-        <input type="text" id="surah"
-          placeholder="Example: Al-Baqarah" required>
+      <a href="quran.html" class="action-link">
+        Open Quran Reader →
+      </a>
 
-        <div class="form-row">
-          <div>
-            <label for="startAyah">Start Ayah</label>
-            <input type="number" id="startAyah" min="1" required>
-          </div>
-          <div>
-            <label for="endAyah">End Ayah</label>
-            <input type="number" id="endAyah" min="1" required>
-          </div>
-        </div>
-
-        <div class="form-row">
-          <div>
-            <label for="pages">Pages Read</label>
-            <input type="number" id="pages" min="1" required>
-          </div>
-          <div>
-            <label for="juz">Juz</label>
-            <select id="juz" required>
-              <option value="">Select Juz</option>
-              <script>
-                for(let i=1;i<=30;i++){
-                  document.write(`<option value="${i}">Juz ${i}</option>`);
-                }
-              </script>
-            </select>
-          </div>
-        </div>
-
-        <label for="duration">Reading Duration (minutes)</label>
-        <input type="number" id="duration" min="1">
-
-        <label for="notes">Notes (Optional)</label>
-        <textarea id="notes"
-          placeholder="Reflection or notes..."></textarea>
-
-        <button type="submit"
-          style="width:100%;margin-top:20px">
-          Save Reading
-        </button>
-
-      </form>
+      <div style="margin-top:18px">
+        <p class="stat-label">Last Reading Position</p>
+        <h3 id="lastReadingPosition">No reading recorded yet</h3>
+      </div>
     </section>
 
+    <!-- TODAY'S READING -->
+    <h2 class="section-title">Today's Reading</h2>
+
+    <section class="stats">
+      <div class="stat">
+        <div class="stat-number" id="todayAyahs">0</div>
+        <div class="stat-label">Ayahs Read</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-number" id="todayPages">0</div>
+        <div class="stat-label">Pages Read</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-number" id="todayJuz">0</div>
+        <div class="stat-label">Juz Covered</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-number" id="todaySurahs">0</div>
+        <div class="stat-label">Surahs Read</div>
+      </div>
+    </section>
+
+    <!-- OVERALL READING -->
+    <h2 class="section-title">My Reading Progress</h2>
+
+    <section class="stats">
+      <div class="stat">
+        <div class="stat-number" id="totalAyahs">0</div>
+        <div class="stat-label">Total Ayahs Read</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-number" id="totalPages">0</div>
+        <div class="stat-label">Total Pages Read</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-number" id="totalJuz">0</div>
+        <div class="stat-label">Juz Covered</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-number" id="totalSurahs">0</div>
+        <div class="stat-label">Surahs Read</div>
+      </div>
+    </section>
+
+    <!-- READING HISTORY -->
     <h2 class="section-title">Reading History</h2>
 
     <section class="card" id="readingHistory">
-      <p>Your reading records will appear here.</p>
+      <p>Your automatic reading history will appear here.</p>
     </section>
 
   </main>
 
+  <!-- BOTTOM NAVIGATION -->
   <nav class="bottom-nav">
     <a href="index.html">🏠<span>Home</span></a>
     <a href="reading.html">📖<span>Reading</span></a>
